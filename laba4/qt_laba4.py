@@ -134,7 +134,7 @@ class Form(QMainWindow):
                     if i == 0:
                         table.append(["Запрос", cos_table[i], jac[i], dic[i]])
                     else:
-                        table.append(["Текст" + str((i+1)), cos_table[i], jac[i], dic[i]])
+                        table.append(["Текст" + str((i)), cos_table[i], jac[i], dic[i]])
 
                 table.sort(key=lambda i: i[1])
                 table.reverse()

@@ -4,9 +4,10 @@ import pymystem3 as Stem
 import pymorphy2 as pm
 from ITvPS.laba4.preprocessing_laba_2 import csv_dict_reader
 from ITvPS.laba4.vectoriser_laba_3 import get_bag_of_stemmed_words, text_stemmer, txt_reader, txt_parser, txt_tokenizer, \
-    bool_tf_tfidf
+    bool_tf_tfidf, bag_of_tokenized
 from nltk.stem.snowball import RussianStemmer
 from ITvPS.laba2.csv_rw_laba2 import csv_dict_writer
+import math
 
 def csv_safe(vect):
     data = [i for i in vect.items()]
@@ -82,6 +83,23 @@ def sim_cosine(vect1, vect2):
     sim = numerator / (denominator_part_vect_1 ** (1 / 2) * denominator_part_vect_2 ** (1 / 2))
     return sim
 
+def get_tf_idf(my_docs, my_dict):
+    tf_idf = {}
+    my_dict = list(my_dict)
+    tf2 = [[0.0] * len(my_dict) for i in range(len(my_docs))]
+    for i in range(len(my_docs)):
+        for j in range(len(my_dict)):
+            if my_dict[j][1:-1] in my_docs[i]:
+                tf2[i][j] = my_docs[i].count(my_dict[j][1:-1]) / len(my_docs[i])
+    for i in range(len(my_dict)):
+        c = []
+        for j in range(len(my_docs)):
+            if my_dict[i][1:-1] in my_docs[j]:
+                c.append(math.fabs(tf2[j][i] * math.log2(len(my_docs[j]) / sum([1.0 for z in my_docs if my_dict[i][1:-1] in z]))))
+            else:
+                c.append(0)
+        tf_idf[my_dict[i]] = c
+    return tf_idf
 
 def jaccard(vect1, vect2):
     numerator = 0.0
@@ -146,6 +164,12 @@ if __name__ == "__main__":
     content = txt_parser(content)
     stemmer = RussianStemmer(False)
     stemmed_texts = text_stemmer(content, stemmer)
+    tokens = stemmed_tokenizer(stemmed_texts)
+    my_dict = bag_of_tokenized(tokens)
+    tfidf = get_tf_idf(stemmed_texts, my_dict)
+    tokens.append([])
+    #vect = bool_tf_tfidf(tokens)[1][' стив ']
+    #print(vect)
     request = formating_request(request)
     parsed_request = txt_parser(request)
 
@@ -154,8 +178,10 @@ if __name__ == "__main__":
         stemmed_request.append(i)
 
     tokens = stemmed_tokenizer(stemmed_request)
+    my_dict = bag_of_tokenized(tokens)
     tokens.append([])
-    vect = bool_tf_tfidf(tokens)[2]
+    vect = get_tf_idf(stemmed_request, my_dict)
+    #vect = bool_tf_tfidf(tokens)[2]
     sim_cosine_table(vect)
     jaccard_table(vect)
     dice_table(vect)
