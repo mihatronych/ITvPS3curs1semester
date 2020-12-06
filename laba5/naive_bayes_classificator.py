@@ -103,7 +103,6 @@ def find_pcd(ppr_doc, c_num, uber_mega_table, p_of_c):
     return pcd
 
 def raw_classificate(doc, uber_mega_table):
-
     ppr_doc = checkExecTimeMystemOneText([del_of_spec_symbols(doc)])[0]
     p_of_c = p_of_c_read_from_txt()
     return [find_pcd(ppr_doc, 1, uber_mega_table, p_of_c), find_pcd(ppr_doc, 2, uber_mega_table, p_of_c), find_pcd(ppr_doc, 3, uber_mega_table, p_of_c)]
